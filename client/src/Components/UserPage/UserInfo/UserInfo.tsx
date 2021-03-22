@@ -4,17 +4,18 @@ import userSelector from '../../../Redux/User/UserPageSelector'
 import '../../../Styles/User/userInfo.scss'
 import { UserType } from '../../../Redux/User/userReducer'
 import { changeFirstName, changeLastName } from '../../../http/userAPI'
-import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
 import { LOGIN_ROUTE } from '../../../Constants/routeConstants'
 import { socket } from '../../../Constants/utilsConstants'
+import { Button, Typography, Form, Input } from 'antd'
+import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons'
 
 const UserInfo = () => {
     const user: UserType = useSelector(userSelector.getUser)
-    const { handleSubmit, register } = useForm()
     const history = useHistory()
     const [firstNameInput, showFirstNameInput] = useState(1)
     const [lastNameInput, showLastNameInput] = useState(1)
+    const { Title } = Typography
 
     type newFirstNameType = {
         newFirstName: string
@@ -37,49 +38,76 @@ const UserInfo = () => {
             history.push(LOGIN_ROUTE)
         })
     }
+    const tailLayout = {
+        wrapperCol: { offset: 8, span: 16 },
+    };
     return (
-        <div>
+        <>
             <div className='name-container'>
                 {firstNameInput === 1 ?
-                    <> <div className='name'>{user.firstName}</div>
-                        <button className='change-name-button' onClick={() => showFirstNameInput(2)}>Сменить</button></>
+                    <> <Title level={3}>{user.firstName}</Title>
+                        <Button onClick={() => showFirstNameInput(2)}>
+                            Сменить
+                        </Button>
+                    </>
                     :
-                    <div>
-                        <form className="form-inline" onSubmit={handleSubmit(changeUserFirstName)}>
+                    <Form
+                        layout='inline'
+                        name="newFirstName"
+                        onFinish={changeUserFirstName}
+                    >
+                        <Form.Item
+                            name="newFirstName"
+                            rules={[{ required: true }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item {...tailLayout}>
                             <div className='user-input'>
-                                <div className="form-group mx-sm-3 mb-2">
-                                    <input type="text" name="newFirstName" placeholder='Имя' className='input-field'
-                                        ref={register({ required: true })} />
-                                </div>
-                                <button type="submit" className='submit-user-button'>&#10004;</button>
-                                <button onClick={() => showFirstNameInput(1)} className='return-user-button'>&#10006;</button>
+                                <Button type="text" htmlType="submit">
+                                    <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '20px' }} />
+                                </Button>
+                                <Button type="text" htmlType="button" onClick={() => showFirstNameInput(1)}>
+                                    <CloseCircleTwoTone twoToneColor="#eb2f96" style={{ fontSize: '20px' }} />
+                                </Button>
                             </div>
-                        </form>
-                    </div>
+                        </Form.Item>
+                    </Form>
                 }
             </div>
             <div className='name-container'>
                 {lastNameInput === 1 ?
-                    <> <div className='name'>{user.lastName}</div>
-                        <button className='change-name-button' onClick={() => showLastNameInput(2)}>Сменить</button></>
+                    <> <Title level={3}>{user.lastName}</Title>
+                        <Button onClick={() => showLastNameInput(2)}>
+                            Сменить
+                        </Button>
+                    </>
                     :
-                    <div>
-                        <form className="form-inline" onSubmit={handleSubmit(changeUserLastName)}>
+                    <Form
+                        layout='inline'
+                        name="newFirstName"
+                        onFinish={changeUserLastName}
+                    >
+                        <Form.Item
+                            name="newFirstName"
+                            rules={[{ required: true }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item {...tailLayout}>
                             <div className='user-input'>
-                                <div className="form-group mx-sm-3 mb-2">
-                                    <input type="text" name="newLastName" placeholder='Фамилия'
-                                        ref={register({ required: true })} />
-                                </div>
-                                <button type="submit" className='submit-user-button'>&#10004;</button>
-                                <button onClick={() => showLastNameInput(1)} className='return-user-button'>&#10006;</button>
+                                <Button type="text" htmlType="submit">
+                                    <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '20px' }} />
+                                </Button>
+                                <Button type="text" htmlType="button" onClick={() => showLastNameInput(1)}>
+                                    <CloseCircleTwoTone twoToneColor="#eb2f96" style={{ fontSize: '20px' }} />
+                                </Button>
                             </div>
-                        </form>
-                    </div>
+                        </Form.Item>
+                    </Form>
                 }
-
-
             </div>
-        </div >
+        </>
     )
 }
 export { UserInfo }

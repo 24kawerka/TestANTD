@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { TaskType } from '../../Redux/User/listReducer'
+import { setUserList, TaskType } from '../../Redux/User/listReducer'
 import UserSelector from '../../Redux/User/UserPageSelector'
 import { Task } from './Task/Task'
 import '../../Styles/User/userPage.scss'
@@ -8,8 +8,10 @@ import { UserInfo } from './UserInfo/UserInfo'
 import { setUser, setIsAuth } from '../../Redux/User/userReducer'
 import { useHistory } from 'react-router-dom'
 import { LOGIN_ROUTE } from '../../Constants/routeConstants'
-import { useForm } from 'react-hook-form'
-import { createTaskThunk, getListThunk } from '../../Redux/Utils/createThunk'
+import { getList } from '../../http/listAPI'
+import { createTaskThunk } from '../../Redux/Utils/createThunk'
+import { Button, Col, Row, Form, Input } from 'antd'
+
 
 
 const UserPage = () => {
@@ -17,11 +19,21 @@ const UserPage = () => {
     const list = useSelector(UserSelector.getUserList)
     const dispatch = useDispatch()
     const history = useHistory()
-    const { handleSubmit, register } = useForm()
 
     useEffect((() => {
-        dispatch(getListThunk)
+        getList().then((responce: any) => {
+            dispatch(setUserList(
+                responce.sort((a: any, b: any) => a.id - b.id)
+            ))
+        })
     }), [])
+    const layout = {
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+    };
+    const tailLayout = {
+        wrapperCol: { offset: 8, span: 16 },
+    };
 
     const logOut = () => {
         dispatch(setIsAuth(false))
@@ -29,31 +41,45 @@ const UserPage = () => {
         history.push(LOGIN_ROUTE)
     }
 
-    const onSubmit = (data: TaskType, e: any) => {
+    const onFinish = (data: TaskType) => {
         dispatch(createTaskThunk(data))
-        e.target.reset()
     }
 
     return (
         <div className='app-container'>
-            <div className='app-wrapper'>
-                <div className='user-info'>
+            <Row>
+                <Col span={12}>
                     <UserInfo />
-                    <button onClick={logOut} className='log-out-button'>Выйти</button>
-                </div>
-                <div className='task-list'>
-                    <form className="px-4 py-3" onSubmit={handleSubmit(onSubmit)}>
-                        <div className='form-group'>
-                            <input name="title" type="text" placeholder='Новая задача'
-                                className="form-control" ref={register({ required: true })} />
-                        </div>
-                        <button type='submit'>Создать</button>
-                    </form>
-                    {list.map((task: TaskType) =>
-                        <Task key={task.id} task={task} />
-                    )}
-                </div>
-            </div>
+                    <Button onClick={logOut} className='log-out-button' type="primary" danger>
+                        Выйти
+                    </Button>
+                </Col>
+                <Col span={12}>
+                    <Form
+                        {...layout}
+                        name="data"
+                        onFinish={onFinish}
+                    >
+                        <Form.Item
+                            label="Новая задача"
+                            name="title"
+                            rules={[{ required: true, message: 'Задача не указана!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item {...tailLayout}>
+                            <Button type="default" htmlType="submit">
+                                Создать
+                        </Button>
+                        </Form.Item>
+                    </Form>
+                    <div className="tasks">
+                        {list.map((task: TaskType) =>
+                            <Task key={task.id} task={task} />
+                        )}
+                    </div>
+                </Col>
+            </Row>
         </div>
     )
 }

@@ -1,11 +1,13 @@
 import React from 'react'
-import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
 import { NavLink, useHistory } from 'react-router-dom'
 import { ADMIN_ROUTE, REGISTRATION_ROUTE, USER_ROUTE } from '../../Constants/routeConstants'
 import { login } from '../../http/userAPI'
 import { setIsAuth, setUser } from '../../Redux/User/userReducer'
 import '../../Styles/auth.scss'
+import { Typography } from 'antd';
+import { Form, Input, Button } from 'antd';
+import "antd/dist/antd.css";
 
 
 type DataLoginType = {
@@ -15,13 +17,11 @@ type DataLoginType = {
 const Auth = () => {
     const dispatch = useDispatch()
     const history = useHistory()
-    const { handleSubmit, register } = useForm()
-    const onSubmit = async (data: DataLoginType, e: any) => {
+    const onFinish = async (data: DataLoginType) => {
         try {
             const responce: any = await login(data.email, data.password)
             dispatch(setUser(responce))
             dispatch(setIsAuth(true))
-            e.target.reset()
             if (responce.role === "ADMIN") {
                 history.push(ADMIN_ROUTE + `?id=${responce.id}`)
             } else {
@@ -29,35 +29,54 @@ const Auth = () => {
             }
         }
         catch (error) {
-            e.target.reset()
             alert(error.request.response.slice(12, -2));
 
         }
     }
+    const { Title, Text } = Typography;
 
+    const layout = {
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+    };
+    const tailLayout = {
+        wrapperCol: { offset: 8, span: 16 },
+    };
     return (
         <div className='container'>
             <div className='login-form'>
-                <h1>TODO ПРИЛОЖЕНИЕ</h1>
-                <form className="px-4 py-3" onSubmit={handleSubmit(onSubmit)}>
-                    <div className='form-group'>
-                        <label className="form-label">Email</label>
-                        <input name="email" type="text" placeholder='email@gmail.com'
-                            className="form-control" ref={register({ required: true })} />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Пароль</label>
-                        <input name="password" className="form-control" type="password" placeholder='Пароль'
-                            ref={register({ required: true })}
-                        />
-                    </div>
-                    <div>
-                        <button className="btn btn-primary" type="submit">
+                <Title>TODO ПРИЛОЖЕНИЕ</Title>
+                <Form
+                    {...layout}
+                    name="basic"
+                    initialValues={{ remember: true }}
+                    onFinish={onFinish}
+                >
+                    <Form.Item
+                        label="Почта"
+                        name="email"
+                        rules={[{ required: true, message: 'Почта не указана!' }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Пароль"
+                        name="password"
+                        rules={[{ required: true, message: 'Пароль не указан!' }]}
+                    >
+                        <Input.Password />
+                    </Form.Item>
+                    <Form.Item {...tailLayout}>
+                        <Button type="default" htmlType="submit">
                             Войти
-                    </button>
-                        <NavLink to={REGISTRATION_ROUTE}><div className='regist-link'>Создать аккаунт</div></NavLink>
-                    </div>
-                </form>
+                        </Button>
+                    </Form.Item>
+                    <NavLink to={REGISTRATION_ROUTE}>
+                        <div className="regist-link">
+                            <Text strong underline>Создать аккаунт</Text>
+                        </div>
+                    </NavLink>
+                </Form>
             </div>
         </div>
     )

@@ -9,15 +9,14 @@ import { AppRouter } from './Components/AppRouter';
 
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <AppRouter />
-        </BrowserRouter>
-      </PersistGate>
-    </Provider>
-  </React.StrictMode>,
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <AppRouter />
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>
+  ,
   document.getElementById('root')
 );
 

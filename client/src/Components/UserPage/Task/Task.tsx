@@ -7,6 +7,8 @@ import { setUserList, TaskType } from '../../../Redux/User/listReducer'
 import { useForm } from 'react-hook-form'
 import { doneTaskThunk, deleteTaskCreatorThunk } from '../../../Redux/Utils/createThunk'
 import { socket } from '../../../Constants/utilsConstants'
+import { Typography, Button, Form, Input } from 'antd'
+import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons'
 
 type PropsTaskType = {
     task: {
@@ -23,9 +25,8 @@ const Task = (props: PropsTaskType) => {
     const list = useSelector(UserSelector.getUserList)
     const dispatch = useDispatch()
     const [inputField, showInputField] = useState(1)
+    const { Text } = Typography
 
-
-    //need changes local change task and create thunk
     const onSubmit = async (newTask: any) => {
         await changeTask(props.task.id, newTask.newTask, props.task.isDone).then(resp => {
             getList().then((responce: any) => {
@@ -53,46 +54,63 @@ const Task = (props: PropsTaskType) => {
     const showTime = () => {
         alert(`Закончена ${props.task.updatedAt.slice(0, 10)} в ${props.task.updatedAt.slice(11, -5)}`)
     }
-
+    const tailLayout = {
+        wrapperCol: { offset: 8, span: 16 },
+    };
     return (
         <div className='task-container'>
             {inputField === 1 ?
                 <div className='title-task-container'>
                     {props.task.isDone === false ?
-                        <div className='title'>{props.task.title}</div>
+                        <Text strong>{props.task.title}</Text>
                         :
-                        <div className='title-done'>{props.task.title}</div>
+                        <Text delete strong>{props.task.title}</Text>
                     }
                     {props.task.isDone === false ?
-                        <button onClick={() => showInputField(2)} className='change-button'>Изменить</button>
+                        <Button onClick={() => showInputField(2)} style={{ backgroundColor: 'yellow' }}>
+                            Изменить
+                        </Button>
                         :
                         null}
                 </div>
                 :
-                <form className="form-inline" onSubmit={handleSubmit(onSubmit)}>
+                <Form
+                    layout='inline'
+                    name="data"
+                    onFinish={onSubmit}
+                >
                     <div className='title-task-input'>
-                        <div className="form-group mx-sm-3 mb-2">
-                            <input type="text" name="newTask" placeholder={props.task.title}
-                                ref={register({ required: true })} />
-                        </div>
-                        <button type="submit" className='submit-button'>&#10004;</button>
-                        <button onClick={() => showInputField(1)} className='return-button'>&#10006;</button>
+                        <Form.Item
+                            name="newTask"
+                            rules={[{ required: true }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item {...tailLayout}>
+                            <div className='title-task-input'>
+                                <Button type="text" htmlType="submit">
+                                    <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: '20px' }} />
+                                </Button>
+                                <Button type="text" htmlType="button" onClick={() => showInputField(1)} >
+                                    <CloseCircleTwoTone twoToneColor="#eb2f96" style={{ fontSize: '20px' }} />
+                                </Button>
+                            </div>
+                        </Form.Item>
                     </div>
-                </form>
+                </Form>
             }
             {props.task.isDone === false ?
-                <button onClick={() => doneTaskCreator(props.task)} className='done-button'>Завершить</button>
+                <Button onClick={() => doneTaskCreator(props.task)} style={{ backgroundColor: 'green' }}>Завершить</Button>
                 :
                 <>
-                    <button className='done-button' onClick={showTime}>
+                    <Button onClick={showTime} style={{ backgroundColor: 'grey' }}>
                         Закончена
-                </button>
-
+                </Button>
                 </>
             }
-            <button onClick={() => deleteTaskCreator(props.task)} className='delete-button'>
+            <Button onClick={() => deleteTaskCreator(props.task)} danger type="primary">
                 Удалить
-                      </button>
+            </Button>
 
         </div >
     )

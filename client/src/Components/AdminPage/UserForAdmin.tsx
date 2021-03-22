@@ -1,8 +1,12 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
+import { changeIsActive, deleteUser, getAllUsers, getUserTasksForAdmin } from '../../http/userAPI'
 import '../../Styles/Admin/admin.scss'
-import { deleteUserCreatorThunk, setIsActiveThunk, showUserTasksThunk } from '../../Redux/Utils/createThunk'
-
+import { setTasksForAdmin } from '../../Redux/Admin/tasksUserForAmin'
+import { getUsers, UsersType } from '../../Redux/Admin/usersReducer'
+import { Button } from 'antd';
+import "antd/dist/antd.css";
+import { UnlockTwoTone, LockTwoTone, CloseCircleTwoTone } from "@ant-design/icons"
 
 
 type UserType = {
@@ -17,26 +21,44 @@ type UserType = {
 const UserForAdmin = (props: UserType) => {
     const dispatch = useDispatch()
     const showUserTasks = (id: number) => {
-        dispatch(showUserTasksThunk(id))
+        getUserTasksForAdmin(id).then(resp => {
+            dispatch(setTasksForAdmin(
+                resp.sort((a: any, b: any) => a.id - b.id)
+            ))
+        })
     }
-    const deleteUserCreator = (id: number) => {
-        dispatch(deleteUserCreatorThunk(id))
+    const deleteUserCreator = async (id: number) => {
+        await deleteUser(id).then(responce => {
+            getAllUsers().then(resp => {
+                dispatch(getUsers(
+                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
+                ))
+            })
+        })
     }
-    const setIsActive = (id: number) => {
-        dispatch(setIsActiveThunk(id))
+    const setIsActive = async (id: number) => {
+        await changeIsActive(id).then(resp => {
+            getAllUsers().then(resp => {
+                dispatch(getUsers(
+                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
+                ))
+            })
+            alert('Изменен статус пользователя!')
+        })
+
     }
     return (
         <div className='user-list-container'>
-            <button className='show-tasks'
+            <Button
                 onClick={() => showUserTasks(props.users.id)} >
                 {`${props.users.firstName} ${props.users.lastName}`}
-            </button>
+            </Button>
             {props.users.isOnline === true ?
-                <button onClick={() => setIsActive(props.users.id)}>&#128274;</button>
+                <Button type="text" onClick={() => setIsActive(props.users.id)}><UnlockTwoTone twoToneColor="#FFFF00" /></Button>
                 :
-                <button onClick={() => setIsActive(props.users.id)}>&#128275;</button>
+                <Button type="text" onClick={() => setIsActive(props.users.id)}><LockTwoTone twoToneColor="#FFFF00" /></Button>
             }
-            <button onClick={() => deleteUserCreator(props.users.id)}>x</button>
+            <Button type="text" onClick={() => deleteUserCreator(props.users.id)}><CloseCircleTwoTone twoToneColor="#eb2f96" /></Button>
 
         </div>
     )

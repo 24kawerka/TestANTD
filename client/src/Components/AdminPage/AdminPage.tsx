@@ -2,16 +2,16 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import '../../Styles/Admin/admin.scss'
 import AdminSelector from '../../Redux/Admin/AdminPageSelector'
-import { UsersType } from '../../Redux/Admin/usersReducer'
+import { getUsers, UsersType } from '../../Redux/Admin/usersReducer'
 import { UserForAdmin } from './UserForAdmin'
-import { getUserTasksForAdmin } from '../../http/userAPI'
+import { getAllUsers, getUserTasksForAdmin } from '../../http/userAPI'
 import Admin from '../../Redux/Admin/AdminPageSelector'
 import { setTasksForAdmin, tasksForAdminType } from '../../Redux/Admin/tasksUserForAmin'
 import { setIsAuth, setUser } from '../../Redux/User/userReducer'
 import { useHistory } from 'react-router-dom'
 import { LOGIN_ROUTE } from '../../Constants/routeConstants'
 import { socket } from '../../Constants/utilsConstants'
-import { getAllUsersThunk, getUserTasksForAdminThunk, showUserTasksThunk } from '../../Redux/Utils/createThunk'
+import { Row, Col, Typography, Button } from 'antd';
 
 
 
@@ -20,16 +20,26 @@ const AdminPage = () => {
     const tasks = useSelector(Admin.getTasksUserForAdmin)
     const dispatch = useDispatch()
     const history = useHistory()
+    const { Title,Text } = Typography
 
     useEffect(() => {
-        dispatch(getAllUsersThunk)
+        getAllUsers().then(resp => {
+            dispatch(getUsers(
+                resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
+            ))
+        })
     }, [])
     useEffect(() => {
         socket.on('newUserRegister', () => {
             alert('Добавлен новый пользователь');
-            dispatch(getAllUsersThunk)
+            getAllUsers().then(resp => {
+                dispatch(getUsers(
+                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
+                ))
+            })
+
         })
-    }, [dispatch])
+    }, [socket])
     const logOut = () => {
         dispatch(setIsAuth(false))
         dispatch(setUser({}))
@@ -37,68 +47,91 @@ const AdminPage = () => {
     }
     useEffect(() => {
         socket.on('deleteTaskNotify', (data: any) => {
-            dispatch(showUserTasksThunk(data.userId))
+            getUserTasksForAdmin(data.userId).then(resp => {
+                dispatch(setTasksForAdmin(
+                    resp.sort((a: any, b: any) => a.id - b.id)
+                ))
+            })
         })
-    }, [dispatch])
+    }, [socket, dispatch])
     useEffect(() => {
         socket.on('createTaskNotify', (data: any) => {
-            dispatch(getUserTasksForAdminThunk(data.userId))
+            getUserTasksForAdmin(data.userId).then(resp => {
+                dispatch(setTasksForAdmin(
+                    resp.sort((a: any, b: any) => a.id - b.id)
+                ))
+            })
         })
-    }, [dispatch])
+    }, [socket, dispatch])
     useEffect(() => {
-        socket.on('changeTaskNotify', (id: number) => {
-            dispatch(getUserTasksForAdminThunk(id))
+        socket.on('changeTaskNotify', (newTask: any) => {
+            getUserTasksForAdmin(newTask).then(resp => {
+                dispatch(setTasksForAdmin(
+                    resp.sort((a: any, b: any) => a.id - b.id)
+                ))
+            })
         })
-    }, [dispatch])
+    }, [socket, dispatch])
     useEffect(() => {
         socket.on('doneTaskNotify', (newTaskId: any) => {
-            dispatch(getUserTasksForAdminThunk(newTaskId))
+            getUserTasksForAdmin(newTaskId).then(resp => {
+                dispatch(setTasksForAdmin(
+                    resp.sort((a: any, b: any) => a.id - b.id)
+                ))
+            })
         })
-    }, [dispatch])
+    }, [socket, dispatch])
     useEffect(() => {
         socket.on('changeFirstNameNotify', (id: number) => {
-            dispatch(getAllUsersThunk)
+            getAllUsers().then(resp => {
+                dispatch(getUsers(
+                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
+                ))
+            })
         })
-    }, [dispatch])
+    }, [socket, dispatch])
     useEffect(() => {
         socket.on('changeLastNameNotify', (id: number) => {
-            dispatch(getAllUsersThunk)
+            getAllUsers().then(resp => {
+                dispatch(getUsers(
+                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
+                ))
+            })
         })
-    }, [dispatch])
+    }, [socket, dispatch])
+    
     return (
         <div className='admin-container'>
-            <div className='wrapper'>
-                <div className='users-side' >
-                    <h2>Пользователи</h2>
-                    <div>
-                        {users.map((users: UsersType) =>
-                            <UserForAdmin key={users.id} users={users} />
-                        )}
-                    </div>
-                </div>
-                <div className='tasks-side'>
+            <Row>
+                <Col span={12}>
+                    <Title>Пользователи</Title>
+                    {users.map((users: UsersType) =>
+                        <UserForAdmin key={users.id} users={users} />
+                    )}
+                </Col>
+                <Col span={12}>
                     <div className='tasks-title'>
-                        <h2>Список задач</h2>
-                        <button className='log-out' onClick={logOut}>Выйти</button>
+                        <Title>Список задач</Title>
+                        <Button type="primary" danger onClick={logOut}>Выйти</Button>
                     </div>
-                    <div>
-                        {tasks.map((task: tasksForAdminType, index: number) =>
-                            <div key={index}>
-                                {task.isDone === false ?
-                                    <div className='user-task' >{task.title}</div>
-                                    :
-                                    <div className='task-done-wrapper'>
-                                        <span className='user-task-done' >{task.title} </span>
-                                        <span className='doneTime'>
-                                            Закончена {task.updatedAt.slice(0, 10)} в {task.updatedAt.slice(11, -5)}
-                                        </span>
-                                    </div>
-                                }
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+                    {tasks.map((task: tasksForAdminType, index: number) =>
+                        <div key={index}>
+                            {task.isDone === false ?
+                                <div className='task-wrapper '>
+                                    <Text strong>{task.title}</Text>
+                                </div>
+                                :
+                                <div className='task-wrapper '>
+                                    <Text delete strong>{task.title}</Text>
+                                    <Text strong>
+                                        Закончена {task.updatedAt.slice(0, 10)} в {task.updatedAt.slice(11, -5)}
+                                    </Text>
+                                </div>
+                            }
+                        </div>
+                    )}
+                </Col>
+            </Row>
         </div>
     )
 }

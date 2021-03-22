@@ -33,10 +33,11 @@ const tasksUserForAdminReducer = (state = InitialTasks, action: tasksUserForAdmi
                 listForAdmin: action.tasks.map(p => p)
             }
         }
+        //dont need this, but thats my solution
         case SET_NEW_TASK_LIST: {
-            state.listForAdmin.push(action.data)
             return {
                 ...state,
+                listForAdmin: [...state.listForAdmin, action.data]
             }
         }
         default: return state
@@ -50,13 +51,8 @@ const setTasksForAdmin = (tasks: Array<tasksForAdminType>) => {
     }
 }
 
-const setNewTaskList = (data: tasksForAdminType) => {
-    return {
-        type: SET_NEW_TASK_LIST,
-        data
-    }
-}
 
-export { tasksUserForAdminReducer, setTasksForAdmin, setNewTaskList }
+
+export { tasksUserForAdminReducer, setTasksForAdmin }
 
 export type { tasksForAdminType }
