@@ -1,9 +1,9 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { changeIsActive, deleteUser, getAllUsers, getUserTasksForAdmin } from '../../http/userAPI'
+import { UserAPI } from '../../http/userAPI'
 import '../../Styles/Admin/admin.scss'
 import { setTasksForAdmin } from '../../Redux/Admin/tasksUserForAmin'
-import { getUsers, UsersType } from '../../Redux/Admin/usersReducer'
+import { getUsers } from '../../Redux/Admin/usersReducer'
 import { Button } from 'antd';
 import "antd/dist/antd.css";
 import { UnlockTwoTone, LockTwoTone, CloseCircleTwoTone } from "@ant-design/icons"
@@ -21,27 +21,21 @@ type UserType = {
 const UserForAdmin = (props: UserType) => {
     const dispatch = useDispatch()
     const showUserTasks = (id: number) => {
-        getUserTasksForAdmin(id).then(resp => {
-            dispatch(setTasksForAdmin(
-                resp.sort((a: any, b: any) => a.id - b.id)
-            ))
+        UserAPI.getUserTasksForAdmin(id).then(resp => {
+            dispatch(setTasksForAdmin(resp))
         })
     }
     const deleteUserCreator = async (id: number) => {
-        await deleteUser(id).then(responce => {
-            getAllUsers().then(resp => {
-                dispatch(getUsers(
-                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
-                ))
+        await UserAPI.deleteUser(id).then(responce => {
+            UserAPI.getAllUsers().then(resp => {
+                dispatch(getUsers(resp))
             })
         })
     }
     const setIsActive = async (id: number) => {
-        await changeIsActive(id).then(resp => {
-            getAllUsers().then(resp => {
-                dispatch(getUsers(
-                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
-                ))
+        await UserAPI.changeIsActive(id).then(resp => {
+            UserAPI.getAllUsers().then(resp => {
+                dispatch(getUsers(resp))
             })
             alert('Изменен статус пользователя!')
         })

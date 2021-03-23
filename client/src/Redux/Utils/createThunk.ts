@@ -1,32 +1,27 @@
 import { socket } from "../../Constants/utilsConstants"
-import { createTask, deleteTask, doneTask, getList } from "../../http/listAPI"
+import { ListAPI } from "../../http/listAPI"
 import { setUserList, TaskType } from "../User/listReducer"
 
 
 
 const createTaskThunk = (data: TaskType) => async (dispatch: any) => {
-    await createTask(data.title, data.isDone = false)
-    getList().then((responce: any) => {
-        dispatch(setUserList(
-            responce.sort((a: any, b: any) => a.id - b.id)
-        ))
+    await ListAPI.createTask(data.title, data.isDone = false)
+    ListAPI.getList().then((responce: any) => {
+        dispatch(setUserList(responce))
         const createdItem = responce[responce.length - 1]
         socket.emit('createTask', createdItem)
     })
 }
 
 const doneTaskThunk = (newTask: any) => async (dispatch: any) => {
-    await doneTask(newTask.id)
-    getList().then((responce: any) => {
-        dispatch(setUserList(
-            responce.sort((a: any, b: any) => a.id - b.id)
-        ))
+    await ListAPI.doneTask(newTask.id)
+    ListAPI.getList().then((responce: any) => {
+        dispatch(setUserList(responce))
     })
 }
 const deleteTaskCreatorThunk = (data: any) => async (dispatch: any) => {
-    await deleteTask(data.id)
+    await ListAPI.deleteTask(data.id)
 }
-
 
 
 export { createTaskThunk, doneTaskThunk, deleteTaskCreatorThunk }

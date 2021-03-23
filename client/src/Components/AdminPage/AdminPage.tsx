@@ -4,9 +4,9 @@ import '../../Styles/Admin/admin.scss'
 import AdminSelector from '../../Redux/Admin/AdminPageSelector'
 import { getUsers, UsersType } from '../../Redux/Admin/usersReducer'
 import { UserForAdmin } from './UserForAdmin'
-import { getAllUsers, getUserTasksForAdmin } from '../../http/userAPI'
+import { UserAPI } from '../../http/userAPI'
 import Admin from '../../Redux/Admin/AdminPageSelector'
-import { setTasksForAdmin, tasksForAdminType } from '../../Redux/Admin/tasksUserForAmin'
+import { setTasksForAdmin, TasksForAdminType } from '../../Redux/Admin/tasksUserForAmin'
 import { setIsAuth, setUser } from '../../Redux/User/userReducer'
 import { useHistory } from 'react-router-dom'
 import { LOGIN_ROUTE } from '../../Constants/routeConstants'
@@ -14,92 +14,110 @@ import { socket } from '../../Constants/utilsConstants'
 import { Row, Col, Typography, Button } from 'antd';
 
 
-
 const AdminPage = () => {
     const users = useSelector(AdminSelector.getUsers)
     const tasks = useSelector(Admin.getTasksUserForAdmin)
     const dispatch = useDispatch()
     const history = useHistory()
-    const { Title,Text } = Typography
+    const { Title, Text } = Typography
 
     useEffect(() => {
-        getAllUsers().then(resp => {
-            dispatch(getUsers(
-                resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
-            ))
+        UserAPI.getAllUsers().then(resp => {
+            dispatch(getUsers(resp))
         })
     }, [])
-    useEffect(() => {
-        socket.on('newUserRegister', () => {
-            alert('Добавлен новый пользователь');
-            getAllUsers().then(resp => {
-                dispatch(getUsers(
-                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
-                ))
-            })
 
-        })
-    }, [socket])
+    useEffect(() => {
+        const newUserRegisterData = () => {
+            alert('Добавлен новый пользователь');
+            UserAPI.getAllUsers().then(resp => {
+                dispatch(getUsers(resp))
+            })
+        }
+        socket.on('newUserRegister', newUserRegisterData)
+        return () => {
+            socket.off('newUserRegister', newUserRegisterData)
+        }
+    }, [dispatch])
+
+    useEffect(() => {
+        const deleteTaskNotifyData = (data: any) => {
+            UserAPI.getUserTasksForAdmin(data.userId).then(resp => {
+                dispatch(setTasksForAdmin(resp))
+            })
+        }
+        socket.on('deleteTaskNotify', deleteTaskNotifyData)
+        return () => {
+            socket.off('deleteTaskNotify', deleteTaskNotifyData)
+        }
+    }, [dispatch])
+
+    useEffect(() => {
+        const createTaskNotifyData = (data: any) => {
+            UserAPI.getUserTasksForAdmin(data.userId).then(resp => {
+                dispatch(setTasksForAdmin(resp))
+            })
+        }
+        socket.on('createTaskNotify', createTaskNotifyData)
+        return () => {
+            socket.off('createTaskNotify', createTaskNotifyData)
+        }
+    }, [dispatch])
+
+    useEffect(() => {
+        const changeTaskNotifyData = (newTask: any) => {
+            UserAPI.getUserTasksForAdmin(newTask).then(resp => {
+                dispatch(setTasksForAdmin(resp))
+            })
+        }
+        socket.on('changeTaskNotify', changeTaskNotifyData)
+        return () => {
+            socket.off('changeTaskNotify', changeTaskNotifyData)
+        }
+    }, [dispatch])
+
+    useEffect(() => {
+        const doneTaskNotifyData = (newTaskId: any) => {
+            UserAPI.getUserTasksForAdmin(newTaskId).then(resp => {
+                dispatch(setTasksForAdmin(resp))
+            })
+        }
+        socket.on('doneTaskNotify', doneTaskNotifyData)
+        return () => {
+            socket.off('doneTaskNotify', doneTaskNotifyData)
+        }
+    }, [dispatch])
+
+    useEffect(() => {
+        const changeFirstNameNotifyData = (id: number) => {
+            UserAPI.getAllUsers().then(resp => {
+                dispatch(getUsers(resp))
+            })
+        }
+        socket.on('changeFirstNameNotify', changeFirstNameNotifyData)
+        return () => {
+            socket.off('changeFirstNameNotify', changeFirstNameNotifyData)
+        }
+    }, [dispatch])
+
+    useEffect(() => {
+        const changeLastNameNotifyData = (id: number) => {
+            UserAPI.getAllUsers().then(resp => {
+                dispatch(getUsers(resp))
+            })
+        }
+        socket.on('changeLastNameNotify', changeLastNameNotifyData)
+        return () => {
+            socket.off('changeLastNameNotify', changeLastNameNotifyData)
+        }
+    }, [dispatch])
+
     const logOut = () => {
         dispatch(setIsAuth(false))
         dispatch(setUser({}))
         history.push(LOGIN_ROUTE)
     }
-    useEffect(() => {
-        socket.on('deleteTaskNotify', (data: any) => {
-            getUserTasksForAdmin(data.userId).then(resp => {
-                dispatch(setTasksForAdmin(
-                    resp.sort((a: any, b: any) => a.id - b.id)
-                ))
-            })
-        })
-    }, [socket, dispatch])
-    useEffect(() => {
-        socket.on('createTaskNotify', (data: any) => {
-            getUserTasksForAdmin(data.userId).then(resp => {
-                dispatch(setTasksForAdmin(
-                    resp.sort((a: any, b: any) => a.id - b.id)
-                ))
-            })
-        })
-    }, [socket, dispatch])
-    useEffect(() => {
-        socket.on('changeTaskNotify', (newTask: any) => {
-            getUserTasksForAdmin(newTask).then(resp => {
-                dispatch(setTasksForAdmin(
-                    resp.sort((a: any, b: any) => a.id - b.id)
-                ))
-            })
-        })
-    }, [socket, dispatch])
-    useEffect(() => {
-        socket.on('doneTaskNotify', (newTaskId: any) => {
-            getUserTasksForAdmin(newTaskId).then(resp => {
-                dispatch(setTasksForAdmin(
-                    resp.sort((a: any, b: any) => a.id - b.id)
-                ))
-            })
-        })
-    }, [socket, dispatch])
-    useEffect(() => {
-        socket.on('changeFirstNameNotify', (id: number) => {
-            getAllUsers().then(resp => {
-                dispatch(getUsers(
-                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
-                ))
-            })
-        })
-    }, [socket, dispatch])
-    useEffect(() => {
-        socket.on('changeLastNameNotify', (id: number) => {
-            getAllUsers().then(resp => {
-                dispatch(getUsers(
-                    resp.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
-                ))
-            })
-        })
-    }, [socket, dispatch])
-    
+
     return (
         <div className='admin-container'>
             <Row>
@@ -114,7 +132,7 @@ const AdminPage = () => {
                         <Title>Список задач</Title>
                         <Button type="primary" danger onClick={logOut}>Выйти</Button>
                     </div>
-                    {tasks.map((task: tasksForAdminType, index: number) =>
+                    {tasks.map((task: TasksForAdminType, index: number) =>
                         <div key={index}>
                             {task.isDone === false ?
                                 <div className='task-wrapper '>

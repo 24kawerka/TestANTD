@@ -10,17 +10,18 @@ const InitialUsersState: InitialUsersStateType = {
     users: [],
     isAuth: true
 }
-type usersReducerActionType = {
+type UsersReducerActionType = {
     type: typeof GET_USERS,
     users: Array<UsersType>
 }
 
-const usersReducer = (state = InitialUsersState, action: usersReducerActionType): InitialUsersStateType => {
+const usersReducer = (state = InitialUsersState, action: UsersReducerActionType): InitialUsersStateType => {
     switch (action.type) {
         case GET_USERS: {
             return {
                 ...state,
-                users: action.users.map(p => p)
+                users:
+                    action.users.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER').map(p => p)
             }
         }
         default: return state

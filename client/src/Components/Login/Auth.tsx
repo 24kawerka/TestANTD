@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { NavLink, useHistory } from 'react-router-dom'
 import { ADMIN_ROUTE, REGISTRATION_ROUTE, USER_ROUTE } from '../../Constants/routeConstants'
-import { login } from '../../http/userAPI'
+import { AuthAPI } from '../../http/userAPI'
 import { setIsAuth, setUser } from '../../Redux/User/userReducer'
 import '../../Styles/auth.scss'
 import { Typography } from 'antd';
@@ -19,7 +19,7 @@ const Auth = () => {
     const history = useHistory()
     const onFinish = async (data: DataLoginType) => {
         try {
-            const responce: any = await login(data.email, data.password)
+            const responce: any = await AuthAPI.login(data.email, data.password)
             dispatch(setUser(responce))
             dispatch(setIsAuth(true))
             if (responce.role === "ADMIN") {
