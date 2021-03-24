@@ -1,5 +1,5 @@
 import React from 'react'
-import { registration } from '../../http/userAPI'
+import { AuthAPI } from '../../http/userAPI'
 import '../../Styles/auth.scss'
 import { setIsAuth, setUser } from '../../Redux/User/userReducer'
 import { useHistory } from 'react-router-dom'
@@ -16,7 +16,7 @@ const Registration = () => {
     const dispatch = useDispatch()
 
     const onFinish = async (data: any) => {
-        const responce = await registration(data.email, data.password, data.firstName, data.lastName)
+        const responce = await AuthAPI.registration(data.email, data.password, data.firstName, data.lastName)
         dispatch(setUser(responce))
         dispatch(setIsAuth(true))
         socket.emit('newUser')

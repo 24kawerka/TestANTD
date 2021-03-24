@@ -1,7 +1,7 @@
-import { SET_NEW_TASK_LIST, SET_TASKS_FOR_ADMIN } from "../../Constants/actionTypeConstants"
+import { SET_TASKS_FOR_ADMIN } from "../../Constants/actionTypeConstants"
 
 
-type tasksForAdminType = {
+type TasksForAdminType = {
     title: string | null,
     isDone: boolean | null,
     userId: number | null,
@@ -9,50 +9,44 @@ type tasksForAdminType = {
 }
 
 type InitialTasksType = {
-    listForAdmin: Array<tasksForAdminType>
+    listForAdmin: Array<TasksForAdminType>
 }
 const InitialTasks: InitialTasksType = {
     listForAdmin: []
 }
-type setTasksForAdminActionType = {
+type SetTasksForAdminActionType = {
     type: typeof SET_TASKS_FOR_ADMIN,
-    tasks: Array<tasksForAdminType>
-}
-type setNewTaskListActionType = {
-    type: typeof SET_NEW_TASK_LIST,
-    data: tasksForAdminType
+    tasks: Array<TasksForAdminType>
 }
 
-type tasksUserForAdminActionType = setTasksForAdminActionType | setNewTaskListActionType
-
-const tasksUserForAdminReducer = (state = InitialTasks, action: tasksUserForAdminActionType): InitialTasksType => {
+const tasksUserForAdminReducer = (state = InitialTasks, action: any): InitialTasksType => {
     switch (action.type) {
         case SET_TASKS_FOR_ADMIN: {
             return {
                 ...state,
-                listForAdmin: action.tasks.map(p => p)
+                listForAdmin: action.tasks.sort((a: any, b: any) => a.id - b.id)
             }
         }
         //dont need this, but thats my solution
-        case SET_NEW_TASK_LIST: {
-            return {
-                ...state,
-                listForAdmin: [...state.listForAdmin, action.data]
-            }
-        }
+        //     case SET_NEW_TASK_LIST: {
+        //         return {
+        //             ...state,
+        //             listForAdmin: [...state.listForAdmin, action.data]
+        //         }
+        //     }
+        //     default: return state
+        // }
         default: return state
     }
 }
 
-const setTasksForAdmin = (tasks: Array<tasksForAdminType>) => {
+const setTasksForAdmin = (tasks: Array<TasksForAdminType>) => {
     return {
         type: SET_TASKS_FOR_ADMIN,
         tasks
     }
 }
 
-
-
 export { tasksUserForAdminReducer, setTasksForAdmin }
 
-export type { tasksForAdminType }
+export type { TasksForAdminType }

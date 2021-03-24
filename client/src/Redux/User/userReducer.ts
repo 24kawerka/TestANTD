@@ -1,4 +1,4 @@
-import { GET_ISAUTH, GET_USER, SET_ISAUTH, SET_USER } from '../../Constants/actionTypeConstants'
+import { SET_ISAUTH, SET_USER } from '../../Constants/actionTypeConstants'
 
 type UserType = {
     email: string
@@ -19,35 +19,18 @@ const InitialUserState: InitialUserStateType = {
     user: {},
     isAuth: false
 }
-type getuserReducerActionType = {
-    type: typeof GET_USER
-}
-type getIsAuthReducerActionType = {
-    type: typeof GET_ISAUTH
-}
-type setuserReducerActionType = {
+type SetUserReducerActionType = {
     type: typeof SET_USER,
     responce: UserType
 }
-type setIsAuthReducerActionType = {
+type SetIsAuthReducerActionType = {
     type: typeof SET_ISAUTH,
     data: boolean
 }
-type userReducerActionType = getuserReducerActionType | getIsAuthReducerActionType | setuserReducerActionType | setIsAuthReducerActionType
+type UserReducerActionType = SetUserReducerActionType | SetIsAuthReducerActionType
 
-const userReducer = (state = InitialUserState, action: userReducerActionType): InitialUserStateType => {
+const userReducer = (state = InitialUserState, action: UserReducerActionType): InitialUserStateType => {
     switch (action.type) {
-        case GET_USER: {
-            return {
-                ...state
-
-            }
-        }
-        case GET_ISAUTH: {
-            return {
-                ...state,
-            }
-        }
         case SET_USER: {
             return {
                 ...state,

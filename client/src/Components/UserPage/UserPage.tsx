@@ -8,25 +8,22 @@ import { UserInfo } from './UserInfo/UserInfo'
 import { setUser, setIsAuth } from '../../Redux/User/userReducer'
 import { useHistory } from 'react-router-dom'
 import { LOGIN_ROUTE } from '../../Constants/routeConstants'
-import { getList } from '../../http/listAPI'
+import { ListAPI } from '../../http/listAPI'
 import { createTaskThunk } from '../../Redux/Utils/createThunk'
 import { Button, Col, Row, Form, Input } from 'antd'
 
 
 
 const UserPage = () => {
-
     const list = useSelector(UserSelector.getUserList)
     const dispatch = useDispatch()
     const history = useHistory()
 
     useEffect((() => {
-        getList().then((responce: any) => {
-            dispatch(setUserList(
-                responce.sort((a: any, b: any) => a.id - b.id)
-            ))
+        ListAPI.getList().then((responce: any) => {
+            dispatch(setUserList(responce))
         })
-    }), [])
+    }), [dispatch])
     const layout = {
         labelCol: { span: 8 },
         wrapperCol: { span: 16 },

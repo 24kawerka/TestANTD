@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import userSelector from '../../../Redux/User/UserPageSelector'
 import '../../../Styles/User/userInfo.scss'
 import { UserType } from '../../../Redux/User/userReducer'
-import { changeFirstName, changeLastName } from '../../../http/userAPI'
+import { UserAPI } from '../../../http/userAPI'
 import { useHistory } from 'react-router-dom'
 import { LOGIN_ROUTE } from '../../../Constants/routeConstants'
 import { socket } from '../../../Constants/utilsConstants'
@@ -24,7 +24,7 @@ const UserInfo = () => {
         newLastName: string
     }
     const changeUserFirstName = (newFirstName: newFirstNameType) => {
-        changeFirstName(user.id, newFirstName.newFirstName).then(resp => {
+        UserAPI.changeFirstName(user.id, newFirstName.newFirstName).then(resp => {
             socket.emit('changeFirstName', user.id)
             alert('Имя изменено, перезайдите в аккаунт');
             history.push(LOGIN_ROUTE)
@@ -32,7 +32,7 @@ const UserInfo = () => {
         })
     }
     const changeUserLastName = (newLastName: newLastNameType) => {
-        changeLastName(user.id, newLastName.newLastName).then(resp => {
+        UserAPI.changeLastName(user.id, newLastName.newLastName).then(resp => {
             socket.emit('changeLastName', user.id)
             alert('Фамилия изменена, перезайдите в аккаунт');
             history.push(LOGIN_ROUTE)

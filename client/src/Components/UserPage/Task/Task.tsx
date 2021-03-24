@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { changeTask, getList } from '../../../http/listAPI'
+import { ListAPI } from '../../../http/listAPI'
 import '../../../Styles/User/task.scss'
 import UserSelector from '../../../Redux/User/UserPageSelector'
 import { setUserList, TaskType } from '../../../Redux/User/listReducer'
-import { useForm } from 'react-hook-form'
 import { doneTaskThunk, deleteTaskCreatorThunk } from '../../../Redux/Utils/createThunk'
 import { socket } from '../../../Constants/utilsConstants'
 import { Typography, Button, Form, Input } from 'antd'
@@ -21,18 +20,15 @@ type PropsTaskType = {
 }
 
 const Task = (props: PropsTaskType) => {
-    const { handleSubmit, register } = useForm()
     const list = useSelector(UserSelector.getUserList)
     const dispatch = useDispatch()
     const [inputField, showInputField] = useState(1)
     const { Text } = Typography
 
     const onSubmit = async (newTask: any) => {
-        await changeTask(props.task.id, newTask.newTask, props.task.isDone).then(resp => {
-            getList().then((responce: any) => {
-                dispatch(setUserList(
-                    responce.sort((a: any, b: any) => a.id - b.id)
-                ))
+        await ListAPI.changeTask(props.task.id, newTask.newTask, props.task.isDone).then(resp => {
+            ListAPI.getList().then((responce: any) => {
+                dispatch(setUserList(responce))
             })
         })
         socket.emit('changeTask', props.task.userId)
@@ -42,9 +38,7 @@ const Task = (props: PropsTaskType) => {
     const deleteTaskCreator = (data: any) => {
         dispatch(deleteTaskCreatorThunk(data))
         const newList = list.filter((task: TaskType) => task.id !== data.id)
-        dispatch(setUserList(
-            newList.sort((a: any, b: any) => a.id - b.id)
-        ))
+        dispatch(setUserList(newList))
         socket.emit('deleteTask', (data))
     }
     const doneTaskCreator = (newTask: any) => {
