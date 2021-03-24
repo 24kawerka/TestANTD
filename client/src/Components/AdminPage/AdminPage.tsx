@@ -12,6 +12,7 @@ import { useHistory } from 'react-router-dom'
 import { LOGIN_ROUTE } from '../../Constants/routeConstants'
 import { socket } from '../../Constants/utilsConstants'
 import { Row, Col, Typography, Button } from 'antd';
+import { TaskType } from '../../Redux/User/listReducer'
 
 
 const AdminPage = () => {
@@ -41,7 +42,7 @@ const AdminPage = () => {
     }, [dispatch])
 
     useEffect(() => {
-        const deleteTaskNotifyData = (data: any) => {
+        const deleteTaskNotifyData = (data: TaskType) => {
             UserAPI.getUserTasksForAdmin(data.userId).then(resp => {
                 dispatch(setTasksForAdmin(resp))
             })
@@ -53,7 +54,7 @@ const AdminPage = () => {
     }, [dispatch])
 
     useEffect(() => {
-        const createTaskNotifyData = (data: any) => {
+        const createTaskNotifyData = (data: TaskType) => {
             UserAPI.getUserTasksForAdmin(data.userId).then(resp => {
                 dispatch(setTasksForAdmin(resp))
             })
@@ -65,7 +66,7 @@ const AdminPage = () => {
     }, [dispatch])
 
     useEffect(() => {
-        const changeTaskNotifyData = (newTask: any) => {
+        const changeTaskNotifyData = (newTask: number) => {
             UserAPI.getUserTasksForAdmin(newTask).then(resp => {
                 dispatch(setTasksForAdmin(resp))
             })
@@ -77,7 +78,7 @@ const AdminPage = () => {
     }, [dispatch])
 
     useEffect(() => {
-        const doneTaskNotifyData = (newTaskId: any) => {
+        const doneTaskNotifyData = (newTaskId: number) => {
             UserAPI.getUserTasksForAdmin(newTaskId).then(resp => {
                 dispatch(setTasksForAdmin(resp))
             })

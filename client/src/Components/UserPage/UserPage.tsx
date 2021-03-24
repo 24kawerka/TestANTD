@@ -20,7 +20,7 @@ const UserPage = () => {
     const history = useHistory()
 
     useEffect((() => {
-        ListAPI.getList().then((responce: any) => {
+        ListAPI.getList().then((responce: TaskType[]) => {
             dispatch(setUserList(responce))
         })
     }), [dispatch])
