@@ -18,6 +18,9 @@ type PropsTaskType = {
         updatedAt: string
     }
 }
+type newTaskType = {
+    newTask: string
+}
 
 const Task = (props: PropsTaskType) => {
     const list = useSelector(UserSelector.getUserList)
@@ -25,9 +28,9 @@ const Task = (props: PropsTaskType) => {
     const [inputField, showInputField] = useState(1)
     const { Text } = Typography
 
-    const onSubmit = async (newTask: any) => {
+    const onSubmit = async (newTask: newTaskType) => {
         await ListAPI.changeTask(props.task.id, newTask.newTask, props.task.isDone).then(resp => {
-            ListAPI.getList().then((responce: any) => {
+            ListAPI.getList().then((responce: TaskType[]) => {
                 dispatch(setUserList(responce))
             })
         })
@@ -35,13 +38,13 @@ const Task = (props: PropsTaskType) => {
         showInputField(1)
     }
 
-    const deleteTaskCreator = (data: any) => {
+    const deleteTaskCreator = (data: TaskType) => {
         dispatch(deleteTaskCreatorThunk(data))
         const newList = list.filter((task: TaskType) => task.id !== data.id)
         dispatch(setUserList(newList))
         socket.emit('deleteTask', (data))
     }
-    const doneTaskCreator = (newTask: any) => {
+    const doneTaskCreator = (newTask: TaskType) => {
         dispatch(doneTaskThunk(newTask))
         socket.emit('doneTask', (props.task.userId))
     }

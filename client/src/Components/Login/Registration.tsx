@@ -10,13 +10,13 @@ import { Typography } from 'antd';
 import { Form, Input, Button } from 'antd';
 import "antd/dist/antd.css";
 
-
+ 
 const Registration = () => {
     const history = useHistory()
     const dispatch = useDispatch()
 
     const onFinish = async (data: any) => {
-        const responce = await AuthAPI.registration(data.email, data.password, data.firstName, data.lastName)
+        const responce: any = await AuthAPI.registration(data.email, data.password, data.firstName, data.lastName)
         dispatch(setUser(responce))
         dispatch(setIsAuth(true))
         socket.emit('newUser')

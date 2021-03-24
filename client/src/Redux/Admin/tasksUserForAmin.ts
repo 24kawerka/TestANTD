@@ -14,10 +14,6 @@ type InitialTasksType = {
 const InitialTasks: InitialTasksType = {
     listForAdmin: []
 }
-type SetTasksForAdminActionType = {
-    type: typeof SET_TASKS_FOR_ADMIN,
-    tasks: Array<TasksForAdminType>
-}
 
 const tasksUserForAdminReducer = (state = InitialTasks, action: any): InitialTasksType => {
     switch (action.type) {

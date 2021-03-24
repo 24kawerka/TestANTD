@@ -34,6 +34,8 @@ const UserForAdmin = (props: UserType) => {
     }
     const setIsActive = async (id: number) => {
         await UserAPI.changeIsActive(id).then(resp => {
+            console.log(resp);
+
             UserAPI.getAllUsers().then(resp => {
                 dispatch(getUsers(resp))
             })
