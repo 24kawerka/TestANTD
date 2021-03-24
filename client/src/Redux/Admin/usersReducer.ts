@@ -21,7 +21,7 @@ const usersReducer = (state = InitialUsersState, action: UsersReducerActionType)
             return {
                 ...state,
                 users:
-                    action.users.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER').map(p => p)
+                    action.users.sort((a: any, b: any) => a.id - b.id).filter((user: UsersType) => user.role === 'USER')
             }
         }
         default: return state

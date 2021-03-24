@@ -23,7 +23,7 @@ const UserPage = () => {
         ListAPI.getList().then((responce: any) => {
             dispatch(setUserList(responce))
         })
-    }), [])
+    }), [dispatch])
     const layout = {
         labelCol: { span: 8 },
         wrapperCol: { span: 16 },

@@ -26,7 +26,7 @@ const listReducer = (state = InitialListState, action: ListReducerActionType): I
         case SET_LIST: {
             return {
                 ...state,
-                list: action.responce.sort((a: any, b: any) => a.id - b.id).map(p => p),
+                list: action.responce.sort((a: any, b: any) => a.id - b.id),
             }
         }
         case SET_NEW_TASK: {

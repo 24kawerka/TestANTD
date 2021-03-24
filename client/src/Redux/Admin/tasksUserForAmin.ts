@@ -24,7 +24,7 @@ const tasksUserForAdminReducer = (state = InitialTasks, action: any): InitialTas
         case SET_TASKS_FOR_ADMIN: {
             return {
                 ...state,
-                listForAdmin: action.tasks.sort((a: any, b: any) => a.id - b.id).map((p: any) => p)
+                listForAdmin: action.tasks.sort((a: any, b: any) => a.id - b.id)
             }
         }
         //dont need this, but thats my solution

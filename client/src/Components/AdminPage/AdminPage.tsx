@@ -25,7 +25,7 @@ const AdminPage = () => {
         UserAPI.getAllUsers().then(resp => {
             dispatch(getUsers(resp))
         })
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
         const newUserRegisterData = () => {
